@@ -12,25 +12,27 @@ using System.Windows.Forms;
 
 namespace ESPurna_Test {
     public partial class MainForm : Form {
-        Blitzwolf_bw_shp2 esp = null;
+        ESPurnaDevice esp = null;
         public MainForm() {
             InitializeComponent();
+        }
+        private void setESPuraDevice() {
+            if (esp == null || !esp.APIkey.Equals(tbApiKey.Text) || !esp.Host.Equals(tbHost.Text)) {
+                esp = new Blitzwolf_bw_shp2(tbHost.Text, tbApiKey.Text);
+            }
         }
 
         private void onClick(object sender, EventArgs e) {
             setESPuraDevice();
-            if (sender == bOff) {
-                esp.SetRelay(false);
-            } else if (sender == bOn) {
-                esp.SetRelay(true);
-            } else if (sender == bToggle) {
-                esp.Toogle();
-            }
-        }
-
-        private void setESPuraDevice() {
-            if (esp == null || !esp.APIkey.Equals(tbApiKey.Text) || !esp.Host.Equals(tbHost.Text)) {
-                esp = new Blitzwolf_bw_shp2(tbHost.Text, tbApiKey.Text);
+            if(esp is Blitzwolf_bw_shp2) {
+                Blitzwolf_bw_shp2 blitz = (Blitzwolf_bw_shp2)esp;
+                if (sender == bOff) {
+                    blitz.SetRelay(false);
+                } else if (sender == bOn) {
+                    blitz.SetRelay(true);
+                } else if (sender == bToggle) {
+                    blitz.Toogle();
+                }
             }
         }
 
@@ -49,22 +51,7 @@ namespace ESPurna_Test {
                     if (esp.LastRefresh.TotalSeconds > 5) {
                         esp.Refresh();
                     }
-                    sb.AppendLine(string.Format("Last refresh: {0:0.0}s", esp.LastRefresh.TotalSeconds));
-
-                    sb.AppendLine(string.Format("Relay: {0}", esp.Relay ? "On" : "Off"));
-                    sb.AppendLine(string.Format("Power: {0:n0} W", esp.Power));
-                    sb.AppendLine(string.Format("Reactive: {0:n0} W", esp.Reactive));
-                    sb.AppendLine(string.Format("Apparent: {0:n0} W", esp.Apparent));
-                    sb.AppendLine(string.Format("Current: {0:0.000} A", esp.Current));
-                    sb.AppendLine(string.Format("Energy: {0:n3} kWh", esp.Energy));
-                    sb.AppendLine(string.Format("Factor: {0:0%}", esp.Factor));
-
-                    sb.AppendLine(string.Format(""));
-
-                    foreach (KeyValuePair<string, espurna_api.ESPurnaDevice.ApiValue> item in esp.ApiValues) {
-                        sb.AppendLine(item.Key + ": " + item.Value);
-                    }
-                    lStatus.Text = sb.ToString();
+                    lStatus.Text = esp.getStatus();
                 }
             } catch (Exception ex) {
                 lStatus.Text = ex.Message + "\n" + ex.StackTrace;

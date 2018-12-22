@@ -47,5 +47,21 @@ namespace espurna_api.Devices {
         public double Current {
             get { return Convert.ToDouble(base.ApiValues["current"].Value); }
         }
+
+        public override string getStatus() {
+            StringBuilder sb = new StringBuilder();
+
+            sb.AppendLine(string.Format("Last refresh: {0:0.0}s", this.LastRefresh.TotalSeconds));
+
+            sb.AppendLine(string.Format("Relay: {0}", this.Relay ? "On" : "Off"));
+            sb.AppendLine(string.Format("Power: {0:n0} W", this.Power));
+            sb.AppendLine(string.Format("Reactive: {0:n0} W", this.Reactive));
+            sb.AppendLine(string.Format("Apparent: {0:n0} W", this.Apparent));
+            sb.AppendLine(string.Format("Current: {0:0.000} A", this.Current));
+            sb.AppendLine(string.Format("Energy: {0:n3} kWh", this.Energy));
+            sb.AppendLine(string.Format("Factor: {0:0%}", this.Factor));
+
+            return sb.ToString();
+        }
     }
 }

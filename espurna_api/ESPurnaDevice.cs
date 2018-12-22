@@ -96,5 +96,14 @@ namespace espurna_api {
                 return Value + "";
             }
         }
+
+        public virtual string getStatus() {
+            StringBuilder sb = new StringBuilder();
+
+            foreach (KeyValuePair<string, espurna_api.ESPurnaDevice.ApiValue> item in this.ApiValues) {
+                sb.AppendLine(item.Key + ": " + item.Value);
+            }
+            return sb.ToString();
+        }
     }
 }
